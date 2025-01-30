@@ -1,0 +1,8 @@
+.vscode
+.idea
+GraphicInterface/rtype
+**/out
+/.vs
+/ECS/.vs
+/GraphicInterface
+build/

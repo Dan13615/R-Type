@@ -1,0 +1,37 @@
+#!/bin/bash
+
+RESET="\033[0m"
+BOLD="\033[1m"
+GREEN="\033[32m"
+YELLOW="\033[33m"
+RED="\033[31m"
+
+TEST_SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+TEST_SCRIPT="$TEST_SCRIPT_DIR/run_tests.sh"
+
+files=$(find . -type f \( -name "*.cpp" -o -name "*.hpp" \) ! -path '*/.*' ! -path './build/*')
+
+if [ -n "$files" ]; then
+    echo -e $BOLD$GREEN " >> Running clang-format..." $RESET
+    for file in $files; do
+        clang-format -i "$file"
+        git add "$file"
+    done
+else
+    echo -e $YELLOW "No .cpp or .hpp files found." $RESET
+fi
+
+if [ $? -ne 0 ]; then
+    echo -e $BOLD$RED "Formatting failed. Please fix the issues before pushing." $RESET
+    exit 1
+fi
+
+echo -e $BOLD$GREEN " >> Running tests..." $RESET
+"$TEST_SCRIPT"
+
+if [ $? -ne 0 ]; then
+    echo -e $BOLD$RED "Tests failed. Please fix the issues before pushing." $RESET
+    exit 1
+fi
+
+echo -e $BOLD$GREEN "All checks passed successfully!" $RESET
